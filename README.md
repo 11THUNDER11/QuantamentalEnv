@@ -1,8 +1,8 @@
-# QuantamentalEnv — Reinforcement Learning for Financial Asset Allocation
+# QuantamentalEnv Reinforcement Learning for Financial Asset Allocation
 
 A custom single-agent [Gymnasium](https://gymnasium.farama.org/) environment simulating a stochastic financial market, paired with a from-scratch Deep Q-Network (DQN) agent trained to learn an optimal asset allocation policy.
 
-Course project — *Autonomous and Adaptive Systems*, University of Bologna (UNIBO), 2025-26.
+Course project *Autonomous and Adaptive Systems*, University of Bologna (UNIBO), 2025-26.
 
 ## Overview
 
@@ -106,7 +106,7 @@ Output is written to `reports/eval/` (DQN) and `reports/baseline/` (random agent
 
 ### 4. Interactive live demo
 
-For a single episode visualized as an interactive, real-time updating dashboard (NAV, capital allocation, asset prices, and reward — all live), run the following directly inside a Jupyter/Colab cell (not via `!python`, since the widget must render in the notebook kernel):
+For a single episode visualized as an interactive, real-time updating dashboard (NAV, capital allocation, asset prices, and reward all live), run the following directly inside a Jupyter/Colab cell (not via `!python`, since the widget must render in the notebook kernel):
 
 ```python
 import sys
