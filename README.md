@@ -66,7 +66,7 @@ QuantamentalEnv/
 ## Installation
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/11THUNDER11/QuantamentalEnv
 cd QuantamentalEnv
 pip install -r requirements.txt
 ```
