@@ -1,21 +1,3 @@
-"""
-demo.py
-=======
-Esegue un episodio dell'agente (DQN o random) e genera un dashboard
-interattivo Plotly con l'andamento di NAV, allocazione, prezzi, reward
-e azioni scelte. Nessun risultato viene salvato su disco.
-
-Compatibile con esecuzione via `!python demo.py` su Colab: il dashboard
-viene salvato come file HTML autonomo e, se il notebook lo supporta,
-mostrato anche inline.
-
-Uso:
-    python demo.py --model checkpoints/model_best.pt
-    python demo.py --model checkpoints/model_best.pt --seed 42
-    python demo.py --random --seed 123
-    python demo.py --model checkpoints/model_best.pt --seed 7 --no-open
-"""
-
 from __future__ import annotations
 
 import argparse
@@ -33,7 +15,6 @@ from agent.dqn import DQNAgent
 from utils.reporter import ACTION_LABELS
 import config
 
-# ── Palette ───────────────────────────────────────────────────────────────────
 ACTION_COLORS = {
     0: "#2ECC71",   # ALL_IN_GROW
     1: "#3498DB",   # ALL_IN_VALU
@@ -45,7 +26,6 @@ PRICE_COLORS = {"GROW": "#27AE60", "VALU": "#2980B9", "DECL": "#C0392B"}
 
 
 def run_episode(agent, env: QuantamentalEnv, seed: int) -> dict:
-    """Esegue un episodio completo e raccoglie la storia step-by-step."""
     obs, info = env.reset(seed=seed)
     initial_nav = info["nav"]
 
@@ -90,7 +70,6 @@ def run_episode(agent, env: QuantamentalEnv, seed: int) -> dict:
 
 
 def build_dashboard(history: dict, seed: int, agent_label: str) -> go.Figure:
-    """Costruisce il dashboard Plotly a 5 pannelli interattivi."""
     steps = history["steps"]
     n     = len(steps)
 
@@ -116,7 +95,6 @@ def build_dashboard(history: dict, seed: int, agent_label: str) -> go.Figure:
         ),
     )
 
-    # ── Pannello 1: NAV ───────────────────────────────────────────────────────
     fig.add_trace(go.Scatter(
         x=steps, y=history["navs"], name="NAV nominale",
         line=dict(color="#E8E8FF", width=2),
@@ -133,7 +111,6 @@ def build_dashboard(history: dict, seed: int, agent_label: str) -> go.Figure:
         fig.add_vline(x=d, line=dict(color="#F39C12", width=1, dash="dot"),
                       opacity=0.5, row=1, col=1)
 
-    # ── Pannello 2: Allocazione stacked ───────────────────────────────────────
     for t in config.TICKERS:
         fig.add_trace(go.Scatter(
             x=steps, y=history["alloc"][t], name=t,
@@ -148,7 +125,6 @@ def build_dashboard(history: dict, seed: int, agent_label: str) -> go.Figure:
         hovertemplate="CASH: %{y:.1f}%<extra></extra>",
     ), row=2, col=1)
 
-    # ── Pannello 3: Prezzi normalizzati ───────────────────────────────────────
     for t in config.TICKERS:
         base = history["prices"][t][0] or 1.0
         norm = [p / base * 100 for p in history["prices"][t]]
@@ -159,7 +135,6 @@ def build_dashboard(history: dict, seed: int, agent_label: str) -> go.Figure:
         ), row=3, col=1)
     fig.add_hline(y=100, line=dict(color="#555577", dash="dot"), row=3, col=1)
 
-    # ── Pannello 4: Reward colorata + marker azione ───────────────────────────
     rew_colors = ["#2ECC71" if r >= 0 else "#E74C3C" for r in history["rewards"]]
     fig.add_trace(go.Bar(
         x=steps, y=history["rewards"], name="Reward",
@@ -167,7 +142,6 @@ def build_dashboard(history: dict, seed: int, agent_label: str) -> go.Figure:
         hovertemplate="Step %{x}<br>Reward: %{y:.5f}<extra></extra>",
     ), row=4, col=1)
 
-    # Markers azione sopra le barre, colorati per tipo
     action_y_offset = max(abs(r) for r in history["rewards"]) * 1.3 or 0.01
     for a_idx in range(config.N_ACTIONS_TOTAL):
         mask = [i for i, a in enumerate(history["actions"]) if a == a_idx]
@@ -182,7 +156,6 @@ def build_dashboard(history: dict, seed: int, agent_label: str) -> go.Figure:
             hovertemplate=f"{ACTION_LABELS[a_idx]}<br>Step " + "%{x}<extra></extra>",
         ), row=4, col=1)
 
-    # ── Layout generale ───────────────────────────────────────────────────────
     fig.update_layout(
         template="plotly_dark",
         height=950,
@@ -263,27 +236,7 @@ def main():
 if __name__ == "__main__":
     main()
 
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Versione LIVE per notebook (Colab/Jupyter): aggiorna il grafico step-by-step
-# usando plotly.graph_objects.FigureWidget, che si ridisegna automaticamente
-# nella cella senza bisogno di richiamare fig.show() o salvare file.
-#
-# Uso (dentro una cella Colab, NON con !python):
-#
-#   import os; os.chdir('/content/qrl_v4/qrl_v4')
-#   import sys; sys.path.insert(0, os.getcwd())
-#   from demo import run_episode_live
-#   from env.env import QuantamentalEnv
-#   from agent.dqn import DQNAgent
-#
-#   env   = QuantamentalEnv()
-#   agent = DQNAgent.load_for_eval("checkpoints/model_best.pt")
-#   run_episode_live(agent, env, seed=123, delay=0.05)
-# ─────────────────────────────────────────────────────────────────────────────
-
 def build_live_widget(agent_label: str, seed: int) -> "go.FigureWidget":
-    """Crea il FigureWidget vuoto con la stessa struttura a 4 pannelli."""
     fig = make_subplots(
         rows=4, cols=1,
         shared_xaxes=True,
@@ -297,13 +250,11 @@ def build_live_widget(agent_label: str, seed: int) -> "go.FigureWidget":
         ),
     )
 
-    # Traccia 0-1: NAV nominale / reale
     fig.add_trace(go.Scatter(x=[], y=[], name="NAV nominale",
                   line=dict(color="#E8E8FF", width=2)), row=1, col=1)
     fig.add_trace(go.Scatter(x=[], y=[], name="NAV reale",
                   line=dict(color="#888899", width=1.4, dash="dash")), row=1, col=1)
 
-    # Tracce 2-5: allocazione stacked (GROW, VALU, DECL, CASH)
     for t in config.TICKERS:
         fig.add_trace(go.Scatter(x=[], y=[], name=t, stackgroup="alloc",
                       line=dict(width=0.5, color=PRICE_COLORS[t]),
@@ -312,12 +263,10 @@ def build_live_widget(agent_label: str, seed: int) -> "go.FigureWidget":
                   line=dict(width=0.5, color="#F39C12"),
                   fillcolor="#F39C12"), row=2, col=1)
 
-    # Tracce 6-8: prezzi normalizzati
     for t in config.TICKERS:
         fig.add_trace(go.Scatter(x=[], y=[], name=f"{t} (prezzo)",
                       line=dict(color=PRICE_COLORS[t], width=1.6)), row=3, col=1)
 
-    # Traccia 9: reward bar
     fig.add_trace(go.Bar(x=[], y=[], name="Reward",
                   marker_color="#2ECC71"), row=4, col=1)
 
@@ -340,11 +289,7 @@ def build_live_widget(agent_label: str, seed: int) -> "go.FigureWidget":
 
 
 def run_episode_live(agent, env: QuantamentalEnv, seed: int, delay: float = 0.05):
-    """
-    Esegue l'episodio aggiornando il FigureWidget ad ogni step.
-    Deve essere chiamata da dentro una cella Jupyter/Colab (non da script .py
-    lanciato con !python), perché il widget si renderizza nel kernel del notebook.
-    """
+
     import time
     from IPython.display import display
 

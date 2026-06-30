@@ -65,6 +65,5 @@ EPSILON_END: float        = 0.05
 EPSILON_DECAY_STEPS: int  = 75000
 TARGET_UPDATE_FREQ: int   = 1_000
 
-# ── Report e logging ───────────────────────────────────────────────────────────
 REPORT_INTERVAL_STEPS: int = STEPS_PER_YEAR
 REPORT_OUTPUT_DIR: str     = "reports/"
