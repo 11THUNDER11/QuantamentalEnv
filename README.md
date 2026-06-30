@@ -47,7 +47,7 @@ QuantamentalEnv/
 
 | Component | Description |
 |---|---|
-| **Observation** | 18-dimensional vector: 2 macro features (time, inflation) + 4 features × 3 assets (normalized price, daily return, dividend yield, days to next dividend) + 4 portfolio features (cash ratio + allocation per asset) |
+| **Observation** | 16-dimensional vector: 4 features × 3 assets (normalized price, daily return, dividend yield, days to next dividend) + 4 portfolio features (cash ratio + allocation per asset) |
 | **Action** | `Discrete(5)`: go all-in on GROW, VALU, or DECL; hold cash; or split equally across the three assets |
 | **Reward** | Step-wise percentage change in real (inflation-deflated) net asset value |
 | **Horizon** | 252 steps (one simulated trading year) |
