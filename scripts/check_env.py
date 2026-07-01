@@ -1,12 +1,3 @@
-"""
-scripts/check_env.py
-====================
-Sanity check: verifica l'interfaccia Gymnasium e un episodio breve.
-
-Uso:
-    python -m scripts.check_env
-"""
-
 import sys, os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
